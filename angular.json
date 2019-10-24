@@ -133,6 +133,41 @@
           }
         }
       }
+    },
+    "dtim-techprofile": {
+      "root": "projects/dtim-techprofile",
+      "sourceRoot": "projects/dtim-techprofile/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/dtim-techprofile/tsconfig.lib.json",
+            "project": "projects/dtim-techprofile/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/dtim-techprofile/src/test.ts",
+            "tsConfig": "projects/dtim-techprofile/tsconfig.spec.json",
+            "karmaConfig": "projects/dtim-techprofile/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/dtim-techprofile/tsconfig.lib.json",
+              "projects/dtim-techprofile/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "wrapper"

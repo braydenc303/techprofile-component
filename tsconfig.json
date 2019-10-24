@@ -17,6 +17,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "dtim-techprofile": [
+        "dist/dtim-techprofile"
+      ],
+      "dtim-techprofile/*": [
+        "dist/dtim-techprofile/*"
+      ]
+    }
   }
 }
