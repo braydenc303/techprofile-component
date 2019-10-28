@@ -5,6 +5,11 @@
 	<tr class="tech-profile-color-meaning-string">
 		<div>{{getColorMeaningString()}}</div>
 	</tr>
+	<tr *ngIf="isButtonBarShowing()">
+		<button (click)="onTopicsOnlyBtnClick()">Topics Only</button>
+		<button (click)="onTopicsAndHeadersBtnClick()">Topics & Headers</button>
+		<button (click)="onTopicsHeadersAndDetailBtnClick()">Full Detail</button>
+	</tr>
 	<table class="tech-profile-topic-level" *ngFor="let topic of getProfileTopics()">
 		<tr class="tech-profile-topic" [ngStyle]="{'background-color':getTopicBackgroundColor(topic.id)}" (click)="onTopicNameClick(topic.id)">
 			<div>{{topic.name}}</div>
@@ -13,7 +18,7 @@
 			<tr class="tech-profile-line-item-level-header" [ngStyle]="{'background-color':getLineItemBackgroundColor(lineItem.id)}" (click)="onLineItemNameClick(lineItem.id)">
 				<td colspan="9">{{lineItem.name}}</td>
 			</tr>
-			<tr class="tech-profile-line-item-level">
+			<tr class="tech-profile-line-item-level" *ngIf="isFullDetailShowing()">
 				<td [ngStyle]="{'background-color':getBackgroundColor(lineItem.id, 0)}" (click)="onLxDescriptionClick(lineItem.id, 0)"><span class="tech-profile-line-item-level-element">{{lineItem.l0Description}}</span></td>
 				<td [ngStyle]="{'background-color':getBackgroundColor(lineItem.id, 1)}" (click)="onLxDescriptionClick(lineItem.id, 1)"><span class="tech-profile-line-item-level-element">{{lineItem.l1Description}}</span></td>
 				<td [ngStyle]="{'background-color':getBackgroundColor(lineItem.id, 2)}" (click)="onLxDescriptionClick(lineItem.id, 2)"><span class="tech-profile-line-item-level-element">{{lineItem.l2Description}}</span></td>

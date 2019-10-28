@@ -13,10 +13,14 @@ import { DtimTechprofileComponentService } from './dtim-techprofile.service';
 export class DtimTechprofileComponent implements OnInit {
 
   @Input() ctrl: any;
+  @Input() allowMultiSelect: boolean = false;
 
   _controller = undefined;
 
- constructor(private tpsvc: DtimTechprofileComponentService) { }
+  selectedTopicIDs = [];
+  selectedLineItemIDs = [];
+
+  constructor(private tpsvc: DtimTechprofileComponentService) { }
 
   ngOnInit() {
     let self = this;
@@ -37,16 +41,94 @@ export class DtimTechprofileComponent implements OnInit {
                 },
                 getProfileLineItemsByTopic: (topicId) => {
                   return self.tpsvc.getLineItemsForATopic(topicId);
+                },
+                _onTopicClick: (thisId) => {
+                  let isSelected = undefined;
+
+                  if (self.selectedTopicIDs.length === 0) {
+                    self.selectedTopicIDs.push(thisId);
+                    isSelected = true;
+                  } else {
+                    if (self.allowMultiSelect) {
+                      if (self.selectedTopicIDs.find((thatId) => { return thisId === thatId; })) {
+                        self.selectedTopicIDs = self.selectedTopicIDs.filter((thatId) => { return thisId !== thatId; })
+                        isSelected = false;
+                      } else {
+                        self.selectedTopicIDs.push(thisId);
+                        isSelected = true;
+                      }
+                    } else {
+                      if (self.selectedTopicIDs[0] === thisId) {
+                        self.selectedTopicIDs = [];
+                        isSelected = false;
+                      } else {
+                        self.selectedTopicIDs[0] = thisId;
+                        isSelected = true;
+                      }
+                    }
+                  }
+
+                  return isSelected;
+                },
+                _onLineItemClick: (thisId) => {
+                  let isSelected = undefined;
+                  if (self.selectedLineItemIDs.length === 0) {
+                    self.selectedLineItemIDs.push(thisId);
+                    isSelected = true;
+                  } else {
+                    if (self.allowMultiSelect) {
+                      if (self.selectedLineItemIDs.find((thatId) => { return thisId === thatId; })) {
+                        self.selectedLineItemIDs = self.selectedLineItemIDs.filter((thatId) => { return thisId !== thatId; })
+                        isSelected = false;
+                      } else {
+                        self.selectedLineItemIDs.push(thisId);
+                        isSelected = true;
+                      }
+                    } else {
+                      if (self.selectedLineItemIDs[0] === thisId) {
+                        self.selectedLineItemIDs = [];
+                        isSelected = false;
+                      } else {
+                        self.selectedLineItemIDs[0] = thisId;
+                        isSelected = true;
+                      }
+                    }
+                  }
+
+                  return isSelected;
                 }
             }
 
             self._controller = { ...defaultFunctionDefinitionObj, ...ctrl };
 
-            if (self._controller && self._controller["initTechProfile"]) {
-              self._controller["initTechProfile"](self.tpsvc.getTechProfile());
-            }
+            if (self._controller) { // handle inits and provider funcs for the client..
+              if( self._controller["initTechProfile"]) {
+                self._controller["initTechProfile"](self.tpsvc.getTechProfile());
+              }
+              if( self._controller["setProviderForSelectedTopicIDs"]) {
+                self._controller["setProviderForSelectedTopicIDs"](() => {
+                  return self.selectedTopicIDs.slice(0) // return a copy of the array
+                });
+              }
+              if( self._controller["setProviderForSelectedLineItemIDs"]) {
+                self._controller["setProviderForSelectedLineItemIDs"](() => {
+                  return self.selectedLineItemIDs.slice(0) // return a copy of the array
+                });
+              }
+            } 
         });
       });
+  }
+
+  isButtonBarShowing() {
+    if (this._controller && this._controller["isButtonBarShowing"]) {
+      let rtn = this._controller["isButtonBarShowing"]()
+      console.log("isButtonBarShowing ", rtn)
+      return rtn;
+    } else {
+      console.log("isButtonBarShowing returning true")
+      return true;
+    }
   }
 
   getProfileName() {
@@ -66,7 +148,7 @@ export class DtimTechprofileComponent implements OnInit {
   }
 
   getProfileLineItemsByTopic(topicId) {
-    if (this._controller && this._controller["getProfileLineItemsByTopic"]) {
+    if (this._controller && this.areTopicHeadersShowing() && this._controller["getProfileLineItemsByTopic"]) {
       return this._controller["getProfileLineItemsByTopic"](topicId);
     } else {
       return [ ];
@@ -91,7 +173,7 @@ export class DtimTechprofileComponent implements OnInit {
 
   getLineItemBackgroundColor(id) {
     if (this._controller && this._controller["getLineItemBackgroundColor"]) {
-      return this._controller["getLineItemBackgroundColor"](id);
+      return this._controller["getLineItemBackgroundColor"](id, this.selectedLineItemIDs.includes(id));
     } else {
       return "white";
     }
@@ -99,7 +181,7 @@ export class DtimTechprofileComponent implements OnInit {
 
   getTopicBackgroundColor(id) {
     if (this._controller && this._controller["getTopicBackgroundColor"]) {
-      return this._controller["getTopicBackgroundColor"](id);
+      return this._controller["getTopicBackgroundColor"](id, this.selectedTopicIDs.includes(id));
     } else {
       return "white";
     }
@@ -112,15 +194,48 @@ export class DtimTechprofileComponent implements OnInit {
   }
 
   onLineItemNameClick(id) {
-    if (this._controller && this._controller["onLineItemClick"]) {
-      return this._controller["onLineItemClick"](id);
+    if (this._controller && this._controller["_onLineItemClick"]) {
+      let isSelected = this._controller["_onLineItemClick"](id);
+
+      if (this._controller && this._controller["onLineItemClick"]) {
+        this._controller["onLineItemClick"](id, isSelected);
+      }
     }
   }
 
   onTopicNameClick(id) {
-    if (this._controller && this._controller["onTopicClick"]) {
-      return this._controller["onTopicClick"](id);
+    if (this._controller && this._controller["_onTopicClick"]) {
+      let isSelected = this._controller["_onTopicClick"](id);
+
+      if (this._controller && this._controller["onTopicClick"]) {
+        this._controller["onTopicClick"](id, isSelected);
+      }
     }
+  }
+
+  _STATE_TOPICS_ONLY = 'topicsOnly'
+  _STATE_TOPICS_HEADERS = 'topicsHeaders'
+  _STATE_FULL_DETAIL = 'fullDetail'
+  collapseToState = this._STATE_FULL_DETAIL;
+
+  onTopicsOnlyBtnClick() {
+    this.collapseToState = this._STATE_TOPICS_ONLY;
+  }
+
+  onTopicsAndHeadersBtnClick() {
+    this.collapseToState = this._STATE_TOPICS_HEADERS;
+  }
+
+  onTopicsHeadersAndDetailBtnClick() {
+    this.collapseToState = this._STATE_FULL_DETAIL;
+  }
+
+  areTopicHeadersShowing() {
+    return this.collapseToState === this._STATE_FULL_DETAIL || this.collapseToState === this._STATE_TOPICS_HEADERS;
+  }
+
+  isFullDetailShowing() {
+    return this.collapseToState === this._STATE_FULL_DETAIL;
   }
 
 }
