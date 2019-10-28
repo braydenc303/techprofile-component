@@ -151,7 +151,7 @@ export class DtimTechprofileComponent implements OnInit {
   }
 
   getProfileLineItemsByTopic(topic) {
-    if (this._controller && this.areTopicHeadersShowing(topic) && this._controller["getProfileLineItemsByTopic"]) {
+    if (this._controller && this.areLineItemHeadersShowing(topic) && this._controller["getProfileLineItemsByTopic"]) {
       return this._controller["getProfileLineItemsByTopic"](topic['id']);
     } else {
       return [ ];
@@ -174,17 +174,17 @@ export class DtimTechprofileComponent implements OnInit {
     }
   }
 
-  getLineItemBackgroundColor(id) {
+  getLineItemBackgroundColor(lineItem) {
     if (this._controller && this._controller["getLineItemBackgroundColor"]) {
-      return this._controller["getLineItemBackgroundColor"](id, this.selectedLineItemIDs.includes(id));
+      return this._controller["getLineItemBackgroundColor"](lineItem, this.selectedLineItemIDs.includes(lineItem['id']), !this.isFullDetailShowing(lineItem));
     } else {
       return "white";
     }
   }
 
-  getTopicBackgroundColor(id) {
+  getTopicBackgroundColor(topic) {
     if (this._controller && this._controller["getTopicBackgroundColor"]) {
-      return this._controller["getTopicBackgroundColor"](id, this.selectedTopicIDs.includes(id));
+      return this._controller["getTopicBackgroundColor"](topic, this.selectedTopicIDs.includes(topic['id']), !this.areLineItemHeadersShowing(topic));
     } else {
       return "white";
     }
@@ -255,7 +255,7 @@ export class DtimTechprofileComponent implements OnInit {
     this.collapseToState = this._STATE_FULL_DETAIL;
   }
 
-  areTopicHeadersShowing(topic) {
+  areLineItemHeadersShowing(topic) {
     if (this.expandedTopicIDs.includes(topic['id'])) {
       return true;
     }
