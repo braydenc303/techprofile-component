@@ -20,6 +20,9 @@ export class DtimTechprofileComponent implements OnInit {
   selectedTopicIDs = [];
   selectedLineItemIDs = [];
 
+  expandedTopicIDs = [];
+  expandedLineItemIDs = [];
+
   constructor(private tpsvc: DtimTechprofileComponentService) { }
 
   ngOnInit() {
@@ -147,9 +150,9 @@ export class DtimTechprofileComponent implements OnInit {
     }
   }
 
-  getProfileLineItemsByTopic(topicId) {
-    if (this._controller && this.areTopicHeadersShowing() && this._controller["getProfileLineItemsByTopic"]) {
-      return this._controller["getProfileLineItemsByTopic"](topicId);
+  getProfileLineItemsByTopic(topic) {
+    if (this._controller && this.areTopicHeadersShowing(topic) && this._controller["getProfileLineItemsByTopic"]) {
+      return this._controller["getProfileLineItemsByTopic"](topic['id']);
     } else {
       return [ ];
     }
@@ -213,6 +216,28 @@ export class DtimTechprofileComponent implements OnInit {
     }
   }
 
+  onExpandLineItemBtnClick() {
+    if (this.allowMultiSelect === false) {
+      let currSelectedId = this.selectedLineItemIDs[0];
+      if (this.expandedLineItemIDs.includes(currSelectedId)) {
+        this.expandedLineItemIDs = this.expandedLineItemIDs.filter((existingId) => { return existingId !== currSelectedId })
+      } else {
+        this.expandedLineItemIDs.push(currSelectedId)
+      }
+    }
+  }
+
+  onExpandTopicBtnClick() {
+    if (this.allowMultiSelect === false) {
+      let currSelectedId = this.selectedTopicIDs[0];
+      if (this.expandedTopicIDs.includes(currSelectedId)) {
+        this.expandedTopicIDs = this.expandedTopicIDs.filter((existingId) => { return existingId !== currSelectedId })
+      } else {
+        this.expandedTopicIDs.push(currSelectedId)
+      }
+    }
+  }
+
   _STATE_TOPICS_ONLY = 'topicsOnly'
   _STATE_TOPICS_HEADERS = 'topicsHeaders'
   _STATE_FULL_DETAIL = 'fullDetail'
@@ -230,11 +255,19 @@ export class DtimTechprofileComponent implements OnInit {
     this.collapseToState = this._STATE_FULL_DETAIL;
   }
 
-  areTopicHeadersShowing() {
+  areTopicHeadersShowing(topic) {
+    if (this.expandedTopicIDs.includes(topic['id'])) {
+      return true;
+    }
+
     return this.collapseToState === this._STATE_FULL_DETAIL || this.collapseToState === this._STATE_TOPICS_HEADERS;
   }
 
-  isFullDetailShowing() {
+  isFullDetailShowing(lineItem) {
+    if (this.expandedLineItemIDs.includes(lineItem['id'])) {
+      return true;
+    }
+    
     return this.collapseToState === this._STATE_FULL_DETAIL;
   }
 
