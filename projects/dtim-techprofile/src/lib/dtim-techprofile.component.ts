@@ -42,10 +42,11 @@ export class DtimTechprofileComponent implements OnInit {
                 getProfileTopics: () => {
                   return self.tpsvc.getTopics();
                 },
-                getProfileLineItemsByTopic: (topicId) => {
-                  return self.tpsvc.getLineItemsForATopic(topicId);
+                getProfileLineItemsByTopic: (topic) => {
+                  return self.tpsvc.getLineItemsForATopic(topic['id']);
                 },
-                _onTopicClick: (thisId) => {
+                _onTopicClick: (topic) => {
+                  let thisId = topic['id'];
                   let isSelected = undefined;
 
                   if (self.selectedTopicIDs.length === 0) {
@@ -73,7 +74,8 @@ export class DtimTechprofileComponent implements OnInit {
 
                   return isSelected;
                 },
-                _onLineItemClick: (thisId) => {
+                _onLineItemClick: (lineItem) => {
+                  let thisId = lineItem['id'];
                   let isSelected = undefined;
                   if (self.selectedLineItemIDs.length === 0) {
                     self.selectedLineItemIDs.push(thisId);
@@ -152,15 +154,15 @@ export class DtimTechprofileComponent implements OnInit {
 
   getProfileLineItemsByTopic(topic) {
     if (this._controller && this.areLineItemHeadersShowing(topic) && this._controller["getProfileLineItemsByTopic"]) {
-      return this._controller["getProfileLineItemsByTopic"](topic['id']);
+      return this._controller["getProfileLineItemsByTopic"](topic);
     } else {
       return [ ];
     }
   }
 
-  getBackgroundColor(id, idx) {
+  getBackgroundColor(lineItem, idx) {
     if (this._controller && this._controller["getBackgroundColor"]) {
-      return this._controller["getBackgroundColor"](id, idx);
+      return this._controller["getBackgroundColor"](lineItem, idx);
     } else {
       return "white";
     }
@@ -190,28 +192,28 @@ export class DtimTechprofileComponent implements OnInit {
     }
   }
 
-  onLxDescriptionClick(id, idx) {
+  onLxDescriptionClick(lineItem, idx) {
     if (this._controller && this._controller["onLxDescriptionClick"]) {
-      return this._controller["onLxDescriptionClick"](id, idx);
+      return this._controller["onLxDescriptionClick"](lineItem, idx);
     } 
   }
 
-  onLineItemNameClick(id) {
+  onLineItemNameClick(lineItem) {
     if (this._controller && this._controller["_onLineItemClick"]) {
-      let isSelected = this._controller["_onLineItemClick"](id);
+      let isSelected = this._controller["_onLineItemClick"](lineItem);
 
       if (this._controller && this._controller["onLineItemClick"]) {
-        this._controller["onLineItemClick"](id, isSelected);
+        this._controller["onLineItemClick"](lineItem, isSelected);
       }
     }
   }
 
-  onTopicNameClick(id) {
+  onTopicNameClick(topic) {
     if (this._controller && this._controller["_onTopicClick"]) {
-      let isSelected = this._controller["_onTopicClick"](id);
+      let isSelected = this._controller["_onTopicClick"](topic);
 
       if (this._controller && this._controller["onTopicClick"]) {
-        this._controller["onTopicClick"](id, isSelected);
+        this._controller["onTopicClick"](topic, isSelected);
       }
     }
   }
