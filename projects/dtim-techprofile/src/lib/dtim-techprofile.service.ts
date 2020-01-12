@@ -42,7 +42,7 @@ export class DtimTechprofileComponentService {
 	}
 
 	isTechProfileAvailable() {
-		return this.techProfile && this.techProfile != null; // && this.questionCountsPerCell && this.questionCountsPerCell != null;
+		return this.techProfile && this.techProfile != null;
 	}
 
 	/** ** */

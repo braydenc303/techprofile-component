@@ -2,6 +2,20 @@ import { Component, OnInit, Injectable, Input } from '@angular/core';
 
 import { DtimTechprofileComponentService } from './dtim-techprofile.service';
 
+
+// This component presents a view of the tech profile.
+//
+// It is included within a larger component, for instance the question edit page (which needs a tech profile
+//  so as to associate a question with various cells), or the tech profile editor (which allows the user to
+//  change the order of the skills, add new ones, etc.). The larger component therefore defines the meaning
+//  and behavior of the tech profile it presents. For instance, the tech profile editor will need to allow
+//  a row to be moved, but the question editor does not need this behavior.
+//
+// The custom behavior is supplied by the 'ctrl' object which is passed as a parameter to this component by
+//  its containing component. This component defines a set of functions which it calls in order to respond to
+//  some user action. The ctrl object overrides those functions to provide the custom behavior. If a containing
+//  component does not need that behavior, it does not override the method. 
+
 @Injectable({
     providedIn: 'root'
 })
@@ -30,6 +44,8 @@ export class DtimTechprofileComponent implements OnInit {
     self.ctrl.then((ctrl) => { 
 
         self.tpsvc._init(ctrl.getEnv(), true);
+        
+        // wait for the tech profile service to load, then.....
         self.tpsvc.waitingPromise().then(() => {
 
             let defaultFunctionDefinitionObj = {  
