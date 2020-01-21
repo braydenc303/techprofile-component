@@ -143,11 +143,8 @@ export class DtimTechprofileComponent implements OnInit {
 
   isButtonBarShowing() {
     if (this._controller && this._controller["isButtonBarShowing"]) {
-      let rtn = this._controller["isButtonBarShowing"]()
-      console.log("isButtonBarShowing ", rtn)
-      return rtn;
+      return this._controller["isButtonBarShowing"]()
     } else {
-      console.log("isButtonBarShowing returning true")
       return true;
     }
   }
