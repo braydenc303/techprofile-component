@@ -2,7 +2,7 @@
 When creating the deployable, includable version of this project, run 
 
     npm install
-    ng build <project-name>, 
+    ng build dtim-techprofile
 
 and then in the resulting ./dist directory, run 
     ng pack
