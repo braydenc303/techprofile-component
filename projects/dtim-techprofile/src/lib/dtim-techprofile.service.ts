@@ -51,19 +51,6 @@ export class DtimTechprofileComponentService {
 	}
 
 	getTopics() {
-		return this.getTechProfileTopics();
-	}
-
-	getLineItemsForATopic(topicId) {
-		return this.getTechProfileLineItemsByTopic(topicId);
-	}
-	/** ** */
-
-	getTechProfile() {
-		return this.getModel()
-	}
-
-	getTechProfileTopics() {
 		let rtn = undefined;
 
 		let model = this.getModel()
@@ -74,18 +61,7 @@ export class DtimTechprofileComponentService {
 		return rtn;
 	}
 
-	getTechProfileTopicById(topicId) {
-		let rtn = undefined;
-
-		let model = this.getModel()
-		if (model) {
-			rtn = model["topics"].find((t) => { return t['id'] === topicId });
-		}
-		
-		return rtn;
-	}
-
-	getTechProfileLineItemsByTopic(topicId) {
+	getLineItemsForATopic(topicId) {
 		let rtn = undefined;
 		
 		let model = this.getModel();
@@ -99,17 +75,6 @@ export class DtimTechprofileComponentService {
 
 		return rtn;
 	}
+	/** ** */
 
-	getTechProfileLineItemById(id) {
-		let rtn = undefined;
-
-		let model = this.getModel();
-		if (model) {
-			for (var x=0; !!rtn && x < model["topics"].length; x++) {
-				rtn = model["topics"][x]["lineItems"].find((li) => { return li["id"] === id; });
-			}
-		}
-
-		return rtn;
-	}
 }
