@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { FunctionPromiseService } from 'savvato-javascript-services'
+
 import { TechProfileAPIService } from './_services/tech-profile-api.service';
 
 @Injectable({
@@ -7,82 +9,92 @@ import { TechProfileAPIService } from './_services/tech-profile-api.service';
 })
 export class DtimTechprofileComponentService {
 
-	techProfile = undefined;
-	questionCountsPerCell = undefined;
+	env = undefined;
 
-	constructor(protected _techProfileAPI: TechProfileAPIService) { }
+	constructor(protected _techProfileAPI: TechProfileAPIService,
+		private _functionPromiseService: FunctionPromiseService) { }
 
-	_init(env, force?: boolean) {
+	_init(env) {
 		let self = this;
 
-		if (force || self.techProfile === undefined) {
-			self.techProfile = null;
-
-			self._techProfileAPI.get(env, 1).then((tp) => {
-				self.techProfile = tp;
+		self._functionPromiseService.initFunc("THE-TP", () => {
+			return new Promise((resolve, reject) => {
+				self._techProfileAPI.get(env, 1).then((tp) => {
+					resolve(tp);
+				})
 			})
-		}
-	}
-
-	waitingPromise() {
-		let self = this;
-		return new Promise((resolve, reject) => {
-
-			function to() {
-				setTimeout(() => {
-					if (self.isTechProfileAvailable())
-						resolve();
-					else
-						to();
-				}, 600);
-			}
-
-			to();
 		})
 	}
 
-	isTechProfileAvailable() {
-		return this.techProfile && this.techProfile != null;
+	reset() {
+		this._functionPromiseService.reset("THE-TP");
+	}
+
+	waitingPromise() {
+		return this._functionPromiseService.waitAndGet("THE-TP", "THE-TP", { 'freshnessLengthInMillis': 60000 * 10 });
 	}
 
 	/** ** */
 	/*		dtim-techprofile-component model service methods */
 	/** ** */
-		getModel() {
-			return this.getTechProfile();
-		}
+	getModel() {
+		return this._functionPromiseService.get("THE-TP", "THE-TP", { 'freshnessLengthInMillis': 60000 * 10 });
+	}
 
-		getName() {
-			return this.getTechProfile()['name']
-		}
+	getName() {
+		let model = this.getModel();
 
-		getTopics() {
-			return this.getTechProfileTopics();
-		}
+		if (model) 
+			return model['name']
+		else
+			return undefined;
+	}
 
-		getLineItemsForATopic(topicId) {
-			return this.getTechProfileLineItemsByTopic(topicId);
-		}
+	getTopics() {
+		return this.getTechProfileTopics();
+	}
+
+	getLineItemsForATopic(topicId) {
+		return this.getTechProfileLineItemsByTopic(topicId);
+	}
 	/** ** */
 
 	getTechProfile() {
-		return this.techProfile;
+		return this.getModel()
 	}
 
 	getTechProfileTopics() {
-		return this.techProfile["topics"].sort((a, b) => { return a["sequence"] - b["sequence"]; });
+		let rtn = undefined;
+
+		let model = this.getModel()
+		if (model) {
+			rtn = model["topics"].sort((a, b) => { return a["sequence"] - b["sequence"]; });	
+		}
+		
+		return rtn;
 	}
 
 	getTechProfileTopicById(topicId) {
-		return this.techProfile["topics"].find((t) => { return t['id'] === topicId });
+		let rtn = undefined;
+
+		let model = this.getModel()
+		if (model) {
+			rtn = model["topics"].find((t) => { return t['id'] === topicId });
+		}
+		
+		return rtn;
 	}
 
 	getTechProfileLineItemsByTopic(topicId) {
 		let rtn = undefined;
-		let topic = this.techProfile["topics"].find((t) => { return t["id"] === topicId; });
+		
+		let model = this.getModel();
+		if (model) {
+			let topic = model["topics"].find((t) => { return t["id"] === topicId; });
 
-		if (topic) {
-			rtn = topic["lineItems"].sort((a, b) => { return a["sequence"] - b["sequence"]; });
+			if (topic) {
+				rtn = topic["lineItems"].sort((a, b) => { return a["sequence"] - b["sequence"]; });
+			}
 		}
 
 		return rtn;
@@ -91,8 +103,11 @@ export class DtimTechprofileComponentService {
 	getTechProfileLineItemById(id) {
 		let rtn = undefined;
 
-		for (var x=0; this.techProfile && !rtn && x < this.techProfile["topics"].length; x++) {
-			rtn = this.techProfile["topics"][x]["lineItems"].find((li) => { return li["id"] === id; });
+		let model = this.getModel();
+		if (model) {
+			for (var x=0; !!rtn && x < model["topics"].length; x++) {
+				rtn = model["topics"][x]["lineItems"].find((li) => { return li["id"] === id; });
+			}
 		}
 
 		return rtn;
