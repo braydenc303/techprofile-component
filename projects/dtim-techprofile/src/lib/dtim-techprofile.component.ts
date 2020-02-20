@@ -37,13 +37,40 @@ export class DtimTechprofileComponent implements OnInit {
   expandedTopicIDs = [];
   expandedLineItemIDs = [];
 
-  constructor(private tpsvc: DtimTechprofileComponentService) { }
+  tpsvc = undefined;
+
+  constructor(private injected_tpsvc: DtimTechprofileComponentService) { }
 
   ngOnInit() {
     let self = this;
     self.ctrl.then((ctrl) => { 
 
-        self.tpsvc._init(ctrl.getEnv(), true);
+        /*
+          If our view of the techprofile.component is one that can change its state,
+          for example, move its line items, or change the descriptive text of a cell,
+          then that view needs to manage the state. This is because if something changes,
+          its complicated to tell this component "hey something in my copy of the state changed.
+          Now you update your copy." Its easier to just have this component be supplied a 
+          copy of the state. 
+
+          This is where getTechProfileModelService() on the controller is useful.
+
+          If the view is read-only, like any other case that doesn't edit the techprofile, then
+          you don't need to supply a techProfileModelService. In that case, the component
+          will use its own default service. This keeps the client code simpler. You will need to
+          supply an environment object, as the component will make a backend call, and needs to 
+          know which endpoint to hit.
+        */
+        
+        if (ctrl.getTechProfileModelService) {
+          // write capable view, supplies its own techprofileservice
+          self.tpsvc = ctrl.getTechProfileModelService();
+          self.tpsvc._init(true /* force init */);
+        } else {
+          // read only view
+          self.tpsvc = self.injected_tpsvc;
+          self.tpsvc._init(ctrl.getEnv());
+        }
         
         // wait for the tech profile service to load, then.....
         self.tpsvc.waitingPromise().then(() => {
@@ -122,21 +149,17 @@ export class DtimTechprofileComponent implements OnInit {
 
             self._controller = { ...defaultFunctionDefinitionObj, ...ctrl };
 
-            if (self._controller) { // handle inits and provider funcs for the client..
-              if( self._controller["initTechProfile"]) {
-                self._controller["initTechProfile"](self.tpsvc.getTechProfile());
-              }
-              if( self._controller["setProviderForSelectedTopicIDs"]) {
-                self._controller["setProviderForSelectedTopicIDs"](() => {
-                  return self.selectedTopicIDs.slice(0) // return a copy of the array
-                });
-              }
-              if( self._controller["setProviderForSelectedLineItemIDs"]) {
-                self._controller["setProviderForSelectedLineItemIDs"](() => {
-                  return self.selectedLineItemIDs.slice(0) // return a copy of the array
-                });
-              }
-            } 
+            // handle inits and provider funcs for the client..
+            if ( self._controller["setProviderForSelectedTopicIDs"]) {
+              self._controller["setProviderForSelectedTopicIDs"](() => {
+                return self.selectedTopicIDs.slice(0) // return a copy of the array
+              });
+            }
+            if ( self._controller["setProviderForSelectedLineItemIDs"]) {
+              self._controller["setProviderForSelectedLineItemIDs"](() => {
+                return self.selectedLineItemIDs.slice(0) // return a copy of the array
+              });
+            }
         });
       });
   }
