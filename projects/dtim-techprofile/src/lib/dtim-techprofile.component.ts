@@ -216,7 +216,7 @@ export class DtimTechprofileComponent implements OnInit {
     if (this._controller && this._controller["getLineItemBackgroundColor"]) {
       return this._controller["getLineItemBackgroundColor"](lineItem, this.selectedLineItemIDs.includes(lineItem['id']), !this.isFullDetailShowing(lineItem));
     } else {
-      return "white";
+      return undefined; // use default color defined in our css
     }
   }
 
@@ -224,7 +224,7 @@ export class DtimTechprofileComponent implements OnInit {
     if (this._controller && this._controller["getTopicBackgroundColor"]) {
       return this._controller["getTopicBackgroundColor"](topic, this.selectedTopicIDs.includes(topic['id']), !this.areLineItemHeadersShowing(topic));
     } else {
-      return "white";
+      return undefined; // use default color defined in our css
     }
   }
 
