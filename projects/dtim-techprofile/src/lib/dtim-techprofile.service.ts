@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { FunctionPromiseService } from 'savvato-javascript-services'
+import { FunctionPromiseService } from '@savvato-software/savvato-javascript-services'
 
 import { TechProfileAPIService } from './_services/tech-profile-api.service';
 
