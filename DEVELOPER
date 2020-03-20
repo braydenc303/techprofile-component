@@ -57,12 +57,16 @@ Here's that command in one big line, if you're feeling frisky.
 This will create a file, which you will have to refer to in the package.json of any other project that will make use of dtim-techprofile. Likely, this is already done for you. If you are just setting up your projects, don't worry about that. However, if you're reading this once you're comfortable with the code, and you've made a change to this repo, then you will need to know about this file, and that you may need to create a new version, and refer to that new version, in the other project. This is to avoid caching issues that prevent you from seeing your changes in the other project.
 
 The file will be named
-    ./dtim-techprofile/dist/dtim-techprofile/dtim-techprofile-0.0.?.tgz
+    ./dtim-techprofile/dist/dtim-techprofile/savvato-software-dtim-techprofile-0.0.?.tgz
+
+The line in package.json to include this library will look like:
+    "@savvato-software/dtim-techprofile-component": "file:../savvato/src/angular/techprofile-component/dist/savvato-software-dtim-techprofile-component-0.0.3.tgz",
+
 
     If it is already depended on by the other project, just change its version number to use your new changes.
 
     If it is not yet depended on by the other project, run this command to add it as a dependency
-        npm install ./path/to/./dtim-techprofile/dist/dtim-techprofile/dtim-techprofile-0.0.?.tgz
+        npm install ./path/to/./dtim-techprofile/dist/savvato-software-dtim-techprofile-component-0.0.?.tgz
 
     Notice the question mark in the path, you'd replace it with your version number.
 
