@@ -2,6 +2,7 @@ import { Component, OnInit, Injectable, Input } from '@angular/core';
 
 import { DtimTechprofileComponentService } from './dtim-techprofile.service';
 
+import jp from 'jsonpath'
 
 // This component presents a view of the tech profile.
 //
@@ -59,13 +60,29 @@ export class DtimTechprofileComponent implements OnInit {
           you don't need to supply a techProfileModelService. In that case, the component
           will use its own default service. This keeps the client code simpler. You will need to
           supply an environment object, as the component will make a backend call, and needs to 
-          know which endpoint to hit.
+          know which url to hit.
         */
         
         if (ctrl.getTechProfileModelService) {
           // write capable view, supplies its own techprofileservice
           self.tpsvc = ctrl.getTechProfileModelService();
           self.tpsvc._init(true /* force init */);
+
+          // set a callback to be called when tech profile has changed (for instance, a line item deleted or added)
+          self.tpsvc.setResetCalculatedStuffCallback(() => {
+            let techProfile = self.tpsvc.getModel();
+
+            if (techProfile) {
+              // get all getLineItems
+              let allLineItemIds = jp.query(techProfile, "$..lineItems");
+              allLineItemIds = allLineItemIds.flat();
+              allLineItemIds = allLineItemIds.map(li => li['id']);
+
+              // if there is any selected line item id, which does not appear in the list of all line items, remove it
+              self.selectedLineItemIDs = self.selectedLineItemIDs.filter(id => allLineItemIds.includes(id))
+            }
+          })
+
         } else {
           // read only view
           self.tpsvc = self.injected_tpsvc;
