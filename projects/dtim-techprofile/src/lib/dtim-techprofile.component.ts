@@ -87,8 +87,15 @@ export class DtimTechprofileComponent implements OnInit {
           // read only view
           self.tpsvc = self.injected_tpsvc;
           self.tpsvc._init(ctrl.getEnv());
+
+          if (ctrl.setRefreshFunc) {
+            // pass a function back to the client, one that it can call to let us know to refresh our data
+            ctrl.setRefreshFunc(() => {
+              self.tpsvc.reset();
+            })
+          }
         }
-        
+
         // wait for the tech profile service to load, then.....
         self.tpsvc.waitingPromise().then(() => {
 
